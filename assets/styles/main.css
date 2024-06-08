@@ -18,7 +18,7 @@ button:hover {
 }
 
 .fullPage {
-	width: 35%;
+	width: 90%;
 	margin: 1rem auto;
 	padding: .7rem;
 	background-color: #DAFFFB;
@@ -28,11 +28,22 @@ button:hover {
 	align-items: center;
 }
 
+@media (min-width: 768px) {
+	.fullPage {
+		width: 60%;
+	}
+}
+
+@media (min-width: 1200px) {
+	.fullPage {
+		width: 35%;
+	}
+}
+
 .titleBox {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(0, auto));
 	gap: 1rem;
-	/* justify-content:stretch; */
 	align-items: center;
 }
 

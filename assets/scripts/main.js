@@ -1,95 +1,115 @@
-const previousOperandElement = document.querySelector('[data-previousOperand]');
-const currentOperandElement = document.querySelector('[data-currentOperand]');
-const buttons = document.querySelectorAll('button');
-const numbers = document.querySelectorAll('[data-number]');
-const allClear = document.querySelector('[data-allClear]');
-const equals = document.querySelector('[data-equals]');
-const dlt = document.querySelector('[data-delete]');
-const operators = document.querySelectorAll('[data-operation]');
-let currentOperand = '';
-let previousOperand = '';
-let currentOperator = '';
+const previousOperandTextElement = document.querySelector(`[data-previousOperand]`);
+const currentOperandTextElement = document.querySelector(`[data-currentOperand]`);
+const buttons = document.querySelectorAll(`button`);
+const numbers = document.querySelectorAll(`[data-number]`);
+const allClear = document.querySelector(`[data-allClear]`);
+const equals = document.querySelector(`[data-equals]`);
+const dlt = document.querySelector(`[data-delete]`);
+const operators = document.querySelectorAll(`[data-operation]`);
+
+let currentOperand = ``;
+let previousOperand = ``;
+let operation = null;
 
 const updateDisplay = () => {
-	currentOperandElement.textContent = currentOperand;
-	previousOperandElement.textContent = previousOperand;
-}
+	currentOperandTextElement.textContent = currentOperand;
+	previousOperandTextElement.textContent = previousOperand;
+};
 
-const handleNumberClick = (number) => {
-	if (number === '.' && currentOperand.includes('.')) return;
+const clear = () => {
+	currentOperand = ``;
+	previousOperand = ``;
+	operation = null;
+	updateDisplay();
+};
+
+const deleteNumber = () => {
+	currentOperand = currentOperand.toString().slice(0, -1);
+	updateDisplay();
+};
+
+const appendNumber = (number) => {
+	if (number === `.` && currentOperand.includes(`.`)) return;
 	currentOperand = currentOperand.toString() + number.toString();
 	updateDisplay();
-}
+};
 
-const handleOperatorClick = (operator) => {
-	if (currentOperand === '') return;
-	if (previousOperand !== '') {
+const chooseOperation = (op) => {
+	if (currentOperand === ``) return;
+	if (previousOperand !== ``) {
 		compute();
 	}
-	currentOperator = operator;
+	operation = op;
 	previousOperand = currentOperand;
-	currentOperand = '';
+	currentOperand = ``;
 	updateDisplay();
-}
+};
 
 const compute = () => {
 	let computation;
 	const prev = parseFloat(previousOperand);
 	const current = parseFloat(currentOperand);
 	if (isNaN(prev) || isNaN(current)) return;
-
-	switch (currentOperator) {
-		case '+':
+	switch (operation) {
+		case `+`:
 			computation = prev + current;
 			break;
-		case '-':
+		case `-`:
 			computation = prev - current;
 			break;
-		case '&times;':
+		case `×`:
 			computation = prev * current;
 			break;
-		case '&div;':
+		case `÷`:
 			computation = prev / current;
 			break;
 		default:
 			return;
 	}
 	currentOperand = computation;
-	currentOperator = undefined;
-	previousOperand = '';
-}
-
-const handleEqualsClick = () => {
-	compute();
+	operation = null;
+	previousOperand = ``;
 	updateDisplay();
-}
-
-const handleAllClearClick = () => {
-	currentOperand = '';
-	previousOperand = '';
-	currentOperator = undefined;
-	updateDisplay();
-}
-
-const handleDeleteClick = () => {
-	currentOperand = currentOperand.toString().slice(0, -1);
-	updateDisplay();
-}
+};
 
 numbers.forEach(button => {
-	button.addEventListener('click', () => {
-		handleNumberClick(button.textContent);
+	button.addEventListener(`click`, () => {
+		appendNumber(button.textContent);
 	});
 });
 
 operators.forEach(button => {
-	button.addEventListener('click', () => {
-		handleOperatorClick(button.textContent);
+	button.addEventListener(`click`, () => {
+		chooseOperation(button.textContent);
 	});
 });
 
-equals.addEventListener('click', handleEqualsClick);
-allClear.addEventListener('click', handleAllClearClick);
-dlt.addEventListener('click', handleDeleteClick);
+equals.addEventListener(`click`, button => {
+	compute();
+});
 
-updateDisplay();
+allClear.addEventListener(`click`, button => {
+	clear();
+});
+
+dlt.addEventListener(`click`, button => {
+	deleteNumber();
+});
+
+document.addEventListener(`keydown`, event => {
+	if (event.key >= 0 && event.key <= 9 || event.key === `.`) {
+		appendNumber(event.key);
+	}
+	if (event.key === `Enter` || event.key === `=`) {
+		compute();
+	}
+	if (event.key === `Backspace`) {
+		deleteNumber();
+	}
+	if (event.key === `Escape`) {
+		clear();
+	}
+	if (event.key === `+` || event.key === `-` || event.key === `*` || event.key === `/`) {
+		chooseOperation(event.key === `*` ? `×` : event.key === `/` ? `÷` : event.key);
+	}
+});
